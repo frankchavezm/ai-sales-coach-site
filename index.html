@@ -137,6 +137,32 @@ button{font-family:inherit;cursor:pointer;border:none}
 .foot{max-width:1240px;margin:0 auto;padding:0 22px 28px;display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;font-family:'JetBrains Mono';font-size:10px;color:var(--dimmer);letter-spacing:.04em}
 .foot b{color:var(--dim);font-weight:500}
 
+/* ---------- EVALUATOR GUIDE ---------- */
+.tourbtn{background:rgba(39,211,171,.12);color:var(--signal);border:1px solid rgba(39,211,171,.45);border-radius:8px;padding:8px 14px;font-size:12.5px;font-weight:600;transition:.15s}
+.tourbtn:hover{background:rgba(39,211,171,.22)}
+.guide{position:fixed;right:20px;bottom:20px;width:330px;max-width:calc(100vw - 32px);background:var(--ink2);border:1px solid rgba(39,211,171,.5);border-radius:16px;box-shadow:0 24px 60px -18px rgba(0,0,0,.85);z-index:100;display:none;overflow:hidden}
+.guide.show{display:block;animation:rise .3s ease}
+.guide-head{display:flex;justify-content:space-between;align-items:center;padding:13px 16px;border-bottom:1px solid var(--line)}
+.guide-head .gh-l{display:flex;align-items:center;gap:8px;font-family:'JetBrains Mono';font-size:10px;letter-spacing:.14em;color:var(--signal)}
+.guide-head .gh-l .gdot{width:7px;height:7px;border-radius:50%;background:var(--signal)}
+.guide-head .step-ct{font-family:'JetBrains Mono';font-size:10px;color:var(--dimmer)}
+.guide-close{background:none;color:var(--dimmer);font-size:16px;line-height:1;padding:2px 6px}
+.guide-close:hover{color:var(--light)}
+.guide-body{padding:16px}
+.guide-body h4{font-family:'Space Grotesk';font-size:15px;font-weight:600;margin-bottom:7px}
+.guide-body p{font-size:13px;color:var(--dim);line-height:1.55}
+.guide-actions{display:flex;gap:9px;padding:0 16px 16px;align-items:center}
+.gbtn{font-family:'Space Grotesk';font-weight:600;font-size:13px;padding:9px 16px;border-radius:8px;transition:.15s}
+.gbtn.primary{background:var(--signal);color:#04231c}
+.gbtn.primary:hover{background:#34e4bb}
+.gbtn.primary:disabled{opacity:.5;cursor:wait}
+.gbtn.quiet{background:transparent;color:var(--dim);border:1px solid var(--line)}
+.gbtn.quiet:hover{color:var(--light)}
+.gwait{font-family:'JetBrains Mono';font-size:10.5px;color:var(--cold);display:none;align-items:center;gap:7px}
+.gwait.show{display:flex}
+.gwait .gw-dot{width:6px;height:6px;border-radius:50%;background:var(--cold);animation:blink 1.1s infinite}
+.spot{outline:2px solid var(--signal);outline-offset:4px;border-radius:14px;box-shadow:0 0 0 6px rgba(39,211,171,.12), 0 0 36px rgba(39,211,171,.25);transition:box-shadow .3s}
+
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -155,6 +181,7 @@ button{font-family:inherit;cursor:pointer;border:none}
     <span>Owner approval</span>
     <button class="switch" id="hitl" aria-label="Toggle owner approval mode" role="switch" aria-checked="false"></button>
   </div>
+  <button class="tourbtn" id="tourBtn">✦ Guided tour</button>
   <button class="reset" id="reset">Reset</button>
 </div>
 
@@ -234,12 +261,30 @@ button{font-family:inherit;cursor:pointer;border:none}
   <span>AI Sales Coach · Columbus, Ohio</span>
 </div>
 
+<!-- EVALUATOR GUIDE DOCK -->
+<div class="guide" id="guide" role="dialog" aria-label="Guided tour">
+  <div class="guide-head">
+    <span class="gh-l"><span class="gdot"></span>EVALUATOR GUIDE</span>
+    <span class="step-ct" id="gCount">1 / 7</span>
+    <button class="guide-close" id="gClose" aria-label="Close guide">×</button>
+  </div>
+  <div class="guide-body">
+    <h4 id="gTitle"></h4>
+    <p id="gText"></p>
+  </div>
+  <div class="guide-actions">
+    <button class="gbtn primary" id="gNext">Start the tour</button>
+    <button class="gbtn quiet" id="gSkip">Explore on my own</button>
+    <span class="gwait" id="gWait"><span class="gw-dot"></span>scenario running…</span>
+  </div>
+</div>
+
 <script>
 (function(){
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   // ---------- state ----------
-  var hitlOn = false, running = false;
+  var hitlOn = false, running = false, onRunComplete = null;
   var leadsHandled = 0, qualifiedCt = 0, booked = 0, respTimes = [];
   var raceStart = null, raceRAF = null;
 
@@ -431,6 +476,7 @@ button{font-family:inherit;cursor:pointer;border:none}
     $('hint').textContent = "Done — the CRM updated itself. Try another scenario, or toggle Owner approval to see human-in-the-loop mode.";
     running = false;
     setButtons(false);
+    if(onRunComplete){ var cb = onRunComplete; onRunComplete = null; cb(key); }
   }
 
   function setButtons(disabled){
@@ -489,6 +535,120 @@ button{font-family:inherit;cursor:pointer;border:none}
     $('crmBody').innerHTML = ''; $('crmEmpty').style.display = 'block';
     $('hint').innerHTML = 'Pick a lead scenario above, or fill in the form yourself and press <b>Send inquiry</b>. Watch both sides of the screen.';
   });
+
+  // ---------- EVALUATOR GUIDED TOUR ----------
+  var tour = {
+    steps: [
+      {
+        title: "Welcome — 90 seconds, both sides of one product",
+        text: "You're looking at AI Sales Coach from two angles at once: the lead's phone on the left, and the business owner's dashboard on the right. I'll run the product for you and point out what to watch.",
+        btn: "Start the tour"
+      },
+      {
+        title: "The left side is the customer",
+        text: "This is a small business's website — a roofing company here — with a normal contact form. Every demo starts the way every real lead starts: someone asks for a quote.",
+        btn: "Next",
+        spot: ".phone"
+      },
+      {
+        title: "The right side is the owner",
+        text: "Response timer, live metrics, and a CRM. The key thing: the owner never types anything here. Everything you'll see appear is written by the agent.",
+        btn: "Next",
+        spot: ".dash"
+      },
+      {
+        title: "Let's race the industry",
+        text: "The average business takes 42 hours to respond to a lead (Harvard Business Review). Watch the timer when I send in a hot lead — and watch the agent qualify them and book a meeting, unassisted.",
+        btn: "Run the hot lead",
+        action: "hot",
+        spot: ".race"
+      },
+      {
+        title: "Answered, qualified, booked — and logged",
+        text: "Seconds, not hours. The lead was scored 87/100, a site visit is on the calendar, and the CRM row below wrote itself — score, status, next step. That's the admin work that eats 70% of a seller's week, gone.",
+        btn: "Next",
+        spot: ".crm"
+      },
+      {
+        title: "Trust is a feature: owner approval mode",
+        text: "New customers start in approve-first mode — the agent drafts every reply and waits for a tap. I'll switch it on and send in a not-ready lead. Watch the amber approval card appear; click Approve & send if you're quick, or it auto-sends.",
+        btn: "Turn it on & run",
+        action: "nurture-hitl",
+        spot: ".hitl"
+      },
+      {
+        title: "That's the product",
+        text: "Instant response, real qualification, booking, nurturing, zero data entry — and a trust dial the owner controls. Explore freely: try the wrong-fit lead to see a polite decline, or type your own inquiry into the form. Thanks for evaluating us.",
+        btn: "Finish"
+      }
+    ],
+    i: 0,
+    active: false
+  };
+
+  var gEl = $('guide'), gTitle = $('gTitle'), gText = $('gText'),
+      gNext = $('gNext'), gCount = $('gCount'), gWait = $('gWait');
+  var spotted = null;
+
+  function spot(sel){
+    unspot();
+    if(!sel) return;
+    var el = document.querySelector(sel);
+    if(el){ el.classList.add('spot'); spotted = el;
+      if(el.scrollIntoView) el.scrollIntoView({behavior:'smooth', block:'nearest'}); }
+  }
+  function unspot(){ if(spotted){ spotted.classList.remove('spot'); spotted = null; } }
+
+  function renderStep(){
+    var s = tour.steps[tour.i];
+    gTitle.textContent = s.title;
+    gText.textContent = s.text;
+    gNext.textContent = s.btn;
+    gNext.disabled = false;
+    gCount.textContent = (tour.i + 1) + " / " + tour.steps.length;
+    gWait.classList.remove('show');
+    spot(s.spot);
+  }
+
+  function openTour(){
+    tour.i = 0; tour.active = true;
+    gEl.classList.add('show');
+    renderStep();
+  }
+  function closeTour(){
+    tour.active = false;
+    gEl.classList.remove('show');
+    unspot();
+  }
+
+  gNext.addEventListener('click', function(){
+    var s = tour.steps[tour.i];
+    if(s.action && !running){
+      gNext.disabled = true;
+      gWait.classList.add('show');
+      onRunComplete = function(){
+        tour.i++;
+        renderStep();
+      };
+      if(s.action === 'hot'){
+        resetPhone(); run('hot');
+      } else if(s.action === 'nurture-hitl'){
+        if(!hitlOn) $('hitl').click();
+        resetPhone(); run('nurture');
+      }
+      return;
+    }
+    if(tour.i >= tour.steps.length - 1){ closeTour(); return; }
+    tour.i++;
+    renderStep();
+  });
+
+  $('gClose').addEventListener('click', closeTour);
+  $('gSkip').addEventListener('click', closeTour);
+  $('tourBtn').addEventListener('click', function(){ if(!running) openTour(); });
+
+  // Auto-open for evaluators on first load
+  setTimeout(openTour, 600);
 })();
 </script>
 </body>
