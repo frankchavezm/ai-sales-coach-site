@@ -3,429 +3,493 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>AI Sales Coach — Every lead, answered the moment it lands</title>
+<title>AI Sales Coach — Live Product Demo</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --ink:#0A1622;
-    --ink-2:#0F2032;
-    --ink-3:#16304a;
-    --paper:#F4F6F9;
-    --paper-2:#FFFFFF;
-    --signal:#27D3AB;      /* responded / agent */
-    --signal-deep:#0FA587;
-    --cold:#F0A23C;        /* lead going cold */
-    --text-light:#E8EEF5;
-    --text-dim:#92A6BC;
-    --text-dark:#13202C;
-    --text-dark-dim:#5A6B7B;
-    --line:#23364c;
-    --line-light:#E3E8EE;
-    --radius:14px;
-    --maxw:1120px;
-  }
+:root{
+  --ink:#0A1622; --ink2:#0F2032; --ink3:#16304a;
+  --signal:#27D3AB; --signal-deep:#0FA587;
+  --cold:#F0A23C;
+  --light:#E8EEF5; --dim:#92A6BC; --dimmer:#5d728c;
+  --line:#23364c;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--ink);color:var(--light);min-height:100vh;-webkit-font-smoothing:antialiased}
+.mono{font-family:'JetBrains Mono',monospace}
+button{font-family:inherit;cursor:pointer;border:none}
 
-  *{box-sizing:border-box;margin:0;padding:0}
-  html{scroll-behavior:smooth}
-  body{
-    font-family:'Inter',system-ui,sans-serif;
-    background:var(--paper);
-    color:var(--text-dark);
-    line-height:1.55;
-    -webkit-font-smoothing:antialiased;
-  }
-  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
-  .mono{font-family:'JetBrains Mono',monospace}
-  .display{font-family:'Space Grotesk',sans-serif}
-  a{color:inherit;text-decoration:none}
+/* ---------- TOP BAR ---------- */
+.topbar{display:flex;align-items:center;gap:14px;padding:14px 22px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.logo{display:flex;align-items:center;gap:9px;font-family:'Space Grotesk';font-weight:700;font-size:17px}
+.logo .dot{width:9px;height:9px;border-radius:50%;background:var(--signal);box-shadow:0 0 0 0 rgba(39,211,171,.5);animation:pulse 2.4s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(39,211,171,.5)}70%{box-shadow:0 0 0 8px rgba(39,211,171,0)}100%{box-shadow:0 0 0 0 rgba(39,211,171,0)}}
+.demo-badge{font-family:'JetBrains Mono';font-size:10px;letter-spacing:.14em;color:var(--cold);border:1px solid rgba(240,162,60,.4);padding:4px 9px;border-radius:6px}
+.spacer{flex:1}
+.persona-group{display:flex;gap:8px;flex-wrap:wrap}
+.persona{background:var(--ink2);color:var(--dim);border:1px solid var(--line);border-radius:8px;padding:8px 14px;font-size:12.5px;font-weight:600;transition:.15s}
+.persona:hover{border-color:var(--signal);color:var(--light)}
+.persona.active{background:var(--signal);color:#04231c;border-color:var(--signal)}
+.persona:disabled{opacity:.45;cursor:not-allowed}
+.hitl{display:flex;align-items:center;gap:9px;font-size:12px;color:var(--dim)}
+.switch{position:relative;width:40px;height:22px;background:var(--ink3);border-radius:20px;border:1px solid var(--line);transition:.2s;padding:0}
+.switch::after{content:"";position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:var(--dim);transition:.2s}
+.switch.on{background:rgba(39,211,171,.25);border-color:var(--signal)}
+.switch.on::after{left:20px;background:var(--signal)}
+.reset{background:transparent;color:var(--dim);border:1px solid var(--line);border-radius:8px;padding:8px 14px;font-size:12.5px}
+.reset:hover{color:var(--light);border-color:var(--dim)}
 
-  /* ---------- NAV ---------- */
-  header{position:sticky;top:0;z-index:50;background:rgba(10,22,34,.85);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
-  .nav{display:flex;align-items:center;justify-content:space-between;height:68px;color:var(--text-light)}
-  .logo{display:flex;align-items:center;gap:10px;font-family:'Space Grotesk';font-weight:700;font-size:21px;letter-spacing:-.02em}
-  .logo .dot{width:11px;height:11px;border-radius:50%;background:var(--signal);box-shadow:0 0 0 0 rgba(39,211,171,.6);animation:pulse 2.4s infinite}
-  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(39,211,171,.55)}70%{box-shadow:0 0 0 9px rgba(39,211,171,0)}100%{box-shadow:0 0 0 0 rgba(39,211,171,0)}}
-  .nav-links{display:flex;gap:30px;font-size:14.5px;color:var(--text-dim)}
-  .nav-links a:hover{color:var(--text-light)}
-  .btn{font-family:'Space Grotesk';font-weight:600;font-size:14.5px;padding:11px 20px;border-radius:9px;border:none;cursor:pointer;transition:.18s;display:inline-block}
-  .btn-primary{background:var(--signal);color:#04231c}
-  .btn-primary:hover{background:#34e4bb;transform:translateY(-1px)}
-  .btn-ghost{background:transparent;color:var(--text-light);border:1px solid var(--line)}
-  .btn-ghost:hover{border-color:var(--signal);color:var(--signal)}
-  @media(max-width:760px){.nav-links{display:none}}
+/* ---------- INTRO HINT ---------- */
+.hint{text-align:center;padding:10px;font-family:'JetBrains Mono';font-size:11.5px;color:var(--dimmer);letter-spacing:.04em}
+.hint b{color:var(--signal);font-weight:500}
 
-  /* ---------- HERO ---------- */
-  .hero{background:var(--ink);color:var(--text-light);position:relative;overflow:hidden;padding:78px 0 96px}
-  .hero::before{content:"";position:absolute;inset:0;
-    background-image:radial-gradient(circle at 1px 1px, rgba(255,255,255,.05) 1px, transparent 0);
-    background-size:26px 26px;opacity:.6;pointer-events:none}
-  .hero::after{content:"";position:absolute;top:-180px;right:-140px;width:520px;height:520px;border-radius:50%;
-    background:radial-gradient(circle,rgba(39,211,171,.18),transparent 65%);pointer-events:none}
-  .hero-grid{position:relative;display:grid;grid-template-columns:1.05fr .95fr;gap:54px;align-items:center}
-  @media(max-width:920px){.hero-grid{grid-template-columns:1fr;gap:44px}}
-  .eyebrow{font-family:'JetBrains Mono';font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:var(--signal);margin-bottom:22px;display:flex;align-items:center;gap:10px}
-  .eyebrow::before{content:"";width:26px;height:1px;background:var(--signal)}
-  h1{font-family:'Space Grotesk';font-weight:700;font-size:clamp(36px,5.2vw,58px);line-height:1.04;letter-spacing:-.025em;margin-bottom:22px}
-  h1 .hl{color:var(--signal)}
-  .lead-copy{font-size:18px;color:var(--text-dim);max-width:520px;margin-bottom:32px}
-  .hero-cta{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
-  .hero-note{font-family:'JetBrains Mono';font-size:12px;color:var(--text-dim);margin-top:22px;letter-spacing:.03em}
+/* ---------- STAGE ---------- */
+.stage{display:grid;grid-template-columns:minmax(330px,420px) 1fr;gap:22px;max-width:1240px;margin:0 auto;padding:10px 22px 26px;align-items:start}
+@media(max-width:880px){.stage{grid-template-columns:1fr}}
 
-  /* ---------- HERO DEMO PANEL (signature) ---------- */
-  .panel{background:linear-gradient(180deg,var(--ink-2),#0c1c2c);border:1px solid var(--line);border-radius:18px;padding:18px;box-shadow:0 30px 60px -25px rgba(0,0,0,.7)}
-  .panel-top{display:flex;align-items:center;justify-content:space-between;padding:4px 6px 14px;border-bottom:1px solid var(--line);margin-bottom:16px}
-  .panel-top .src{font-family:'JetBrains Mono';font-size:11.5px;color:var(--text-dim);letter-spacing:.06em}
-  .timer{font-family:'JetBrains Mono';font-size:12.5px;font-weight:700;color:var(--signal);background:rgba(39,211,171,.12);border:1px solid rgba(39,211,171,.3);padding:5px 11px;border-radius:7px}
-  .msg{margin-bottom:12px;display:flex;flex-direction:column;max-width:84%}
-  .msg .who{font-family:'JetBrains Mono';font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px;color:var(--text-dim)}
-  .bubble{padding:12px 15px;border-radius:13px;font-size:14.5px;line-height:1.5}
-  .msg.lead{align-self:flex-start}
-  .msg.lead .bubble{background:#1b3147;color:var(--text-light);border-top-left-radius:4px}
-  .msg.agent{align-self:flex-end;align-items:flex-end}
-  .msg.agent .who{color:var(--signal)}
-  .msg.agent .bubble{background:var(--signal);color:#04231c;border-top-right-radius:4px;font-weight:500}
-  .typing .bubble{display:inline-flex;gap:4px;align-items:center}
-  .typing span{width:6px;height:6px;border-radius:50%;background:#04231c;opacity:.4;animation:blink 1.1s infinite}
-  .typing span:nth-child(2){animation-delay:.2s}.typing span:nth-child(3){animation-delay:.4s}
-  @keyframes blink{0%,60%,100%{opacity:.25}30%{opacity:.9}}
-  .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;opacity:0;transform:translateY(6px);transition:.5s}
-  .chips.show{opacity:1;transform:none}
-  .chip{font-family:'JetBrains Mono';font-size:11px;padding:6px 10px;border-radius:7px;letter-spacing:.04em;display:flex;align-items:center;gap:6px}
-  .chip.q{background:rgba(39,211,171,.13);color:var(--signal);border:1px solid rgba(39,211,171,.3)}
-  .chip.b{background:rgba(240,162,60,.13);color:var(--cold);border:1px solid rgba(240,162,60,.3)}
-  .chip.c{background:#1b3147;color:var(--text-dim)}
+/* ---------- LEFT: LEAD'S PHONE ---------- */
+.phone{background:var(--ink2);border:1px solid var(--line);border-radius:22px;overflow:hidden;box-shadow:0 24px 50px -22px rgba(0,0,0,.8)}
+.phone-head{padding:13px 18px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
+.phone-head .biz{font-family:'Space Grotesk';font-weight:600;font-size:14px}
+.phone-head .lbl{font-family:'JetBrains Mono';font-size:9.5px;color:var(--dimmer);letter-spacing:.1em}
+.phone-body{padding:18px;min-height:430px;display:flex;flex-direction:column}
 
-  /* ---------- STAT STRIP ---------- */
-  .strip{background:var(--ink-2);color:var(--text-light);border-top:1px solid var(--line)}
-  .strip-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line)}
-  @media(max-width:760px){.strip-grid{grid-template-columns:1fr}}
-  .stat{background:var(--ink-2);padding:30px 26px}
-  .stat .num{font-family:'Space Grotesk';font-weight:700;font-size:38px;letter-spacing:-.02em}
-  .stat .num.cold{color:var(--cold)}.stat .num.sig{color:var(--signal)}
-  .stat .lbl{font-size:13.5px;color:var(--text-dim);margin-top:6px}
-  .stat .src{font-family:'JetBrains Mono';font-size:10.5px;color:#5d728c;margin-top:8px;letter-spacing:.04em}
+/* lead form */
+.form h3{font-family:'Space Grotesk';font-size:17px;margin-bottom:4px}
+.form p{font-size:12.5px;color:var(--dim);margin-bottom:16px}
+.form label{display:block;font-family:'JetBrains Mono';font-size:9.5px;letter-spacing:.1em;color:var(--dim);text-transform:uppercase;margin:11px 0 5px}
+.form input,.form textarea{width:100%;background:var(--ink);border:1px solid var(--line);border-radius:8px;padding:10px 12px;color:var(--light);font-family:'Inter';font-size:13.5px;resize:none}
+.form input:focus,.form textarea:focus{outline:none;border-color:var(--signal)}
+.send{margin-top:16px;width:100%;background:var(--signal);color:#04231c;font-family:'Space Grotesk';font-weight:600;font-size:14px;padding:12px;border-radius:9px;transition:.15s}
+.send:hover{background:#34e4bb}
+.send:disabled{opacity:.5;cursor:wait}
 
-  /* ---------- SECTIONS ---------- */
-  section.block{padding:88px 0}
-  .sec-head{max-width:680px;margin-bottom:52px}
-  .kicker{font-family:'JetBrains Mono';font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--signal-deep);margin-bottom:16px}
-  h2{font-family:'Space Grotesk';font-weight:700;font-size:clamp(28px,3.6vw,40px);letter-spacing:-.02em;line-height:1.1;margin-bottom:16px}
-  .sec-head p{font-size:17.5px;color:var(--text-dark-dim)}
+/* chat */
+.chat{display:none;flex-direction:column;gap:10px;flex:1}
+.chat.show{display:flex}
+.bubble-row{display:flex;flex-direction:column;max-width:88%}
+.bubble-row .who{font-family:'JetBrains Mono';font-size:9px;letter-spacing:.09em;text-transform:uppercase;color:var(--dimmer);margin-bottom:4px}
+.bubble{padding:10px 13px;border-radius:12px;font-size:13px;line-height:1.45}
+.from-lead{align-self:flex-start}
+.from-lead .bubble{background:var(--ink3);border-top-left-radius:4px}
+.from-agent{align-self:flex-end;align-items:flex-end}
+.from-agent .who{color:var(--signal)}
+.from-agent .bubble{background:var(--signal);color:#04231c;font-weight:500;border-top-right-radius:4px}
+.typing-bubble{display:inline-flex;gap:4px;align-items:center;padding:12px 14px}
+.typing-bubble span{width:5px;height:5px;border-radius:50%;background:#04231c;opacity:.4;animation:blink 1.1s infinite}
+.typing-bubble span:nth-child(2){animation-delay:.2s}.typing-bubble span:nth-child(3){animation-delay:.4s}
+@keyframes blink{0%,60%,100%{opacity:.25}30%{opacity:.9}}
+.sysline{font-family:'JetBrains Mono';font-size:10px;color:var(--dimmer);text-align:center;padding:4px 0;letter-spacing:.05em}
+.sysline.good{color:var(--signal)}
+.sysline.warm{color:var(--cold)}
 
-  /* problem cards */
-  .leak{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
-  @media(max-width:820px){.leak{grid-template-columns:1fr}}
-  .leak-card{background:var(--paper-2);border:1px solid var(--line-light);border-radius:var(--radius);padding:26px}
-  .leak-card .big{font-family:'Space Grotesk';font-weight:700;font-size:30px;color:var(--text-dark);letter-spacing:-.01em}
-  .leak-card p{font-size:14.5px;color:var(--text-dark-dim);margin-top:10px}
+/* ---------- RIGHT: OWNER DASHBOARD ---------- */
+.dash{display:flex;flex-direction:column;gap:16px}
+.dash-head{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px}
+.dash-head h2{font-family:'Space Grotesk';font-size:17px;font-weight:600}
+.dash-head .sub{font-family:'JetBrains Mono';font-size:10px;color:var(--dimmer);letter-spacing:.08em}
 
-  /* how it works — real 3-step sequence */
-  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:0}
-  @media(max-width:820px){.steps{grid-template-columns:1fr}}
-  .step{position:relative;padding:30px 28px;border:1px solid var(--line-light);border-right:none;background:var(--paper-2)}
-  .step:last-child{border-right:1px solid var(--line-light)}
-  @media(max-width:820px){.step{border-right:1px solid var(--line-light);border-bottom:none}.step:last-child{border-bottom:1px solid var(--line-light)}}
-  .step .n{font-family:'JetBrains Mono';font-size:12px;color:var(--signal-deep);letter-spacing:.1em;margin-bottom:18px}
-  .step h3{font-family:'Space Grotesk';font-weight:600;font-size:20px;margin-bottom:10px}
-  .step p{font-size:14.5px;color:var(--text-dark-dim)}
-  .step .tick{font-family:'JetBrains Mono';font-size:11.5px;color:var(--cold);margin-top:16px;letter-spacing:.03em}
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+@media(max-width:560px){.metrics{grid-template-columns:repeat(2,1fr)}}
+.metric{background:var(--ink2);border:1px solid var(--line);border-radius:12px;padding:14px 15px}
+.metric .v{font-family:'Space Grotesk';font-weight:700;font-size:24px}
+.metric .v.sig{color:var(--signal)}
+.metric .v.warm{color:var(--cold)}
+.metric .k{font-size:10.5px;color:var(--dim);margin-top:3px}
 
-  /* why grid */
-  .why{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
-  @media(max-width:760px){.why{grid-template-columns:1fr}}
-  .why-card{background:var(--ink);color:var(--text-light);border-radius:var(--radius);padding:28px;border:1px solid var(--line)}
-  .why-card h3{font-family:'Space Grotesk';font-weight:600;font-size:19px;margin-bottom:10px;display:flex;align-items:center;gap:10px}
-  .why-card h3 .b{width:7px;height:7px;border-radius:50%;background:var(--signal)}
-  .why-card p{font-size:14.5px;color:var(--text-dim)}
+/* race timer card */
+.race{background:var(--ink2);border:1px solid var(--line);border-radius:12px;padding:15px 17px;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.race .t{font-family:'JetBrains Mono';font-weight:700;font-size:30px;color:var(--signal);min-width:96px}
+.race .t.idle{color:var(--dimmer)}
+.race .vs{font-size:11.5px;color:var(--dim);line-height:1.5}
+.race .vs b{color:var(--cold);font-weight:600}
 
-  /* audience */
-  .aud{display:grid;grid-template-columns:1fr 1fr;gap:20px}
-  @media(max-width:760px){.aud{grid-template-columns:1fr}}
-  .aud-card{border:1px solid var(--line-light);border-radius:var(--radius);padding:30px;background:var(--paper-2)}
-  .aud-card .tag{font-family:'JetBrains Mono';font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--signal-deep);margin-bottom:14px}
-  .aud-card h3{font-family:'Space Grotesk';font-weight:600;font-size:22px;margin-bottom:10px}
-  .aud-card p{font-size:15px;color:var(--text-dark-dim)}
+/* approval queue */
+.approve{display:none;background:rgba(240,162,60,.08);border:1px solid rgba(240,162,60,.4);border-radius:12px;padding:14px 16px}
+.approve.show{display:block;animation:rise .3s ease}
+@keyframes rise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.approve .a-head{font-family:'JetBrains Mono';font-size:10px;letter-spacing:.12em;color:var(--cold);margin-bottom:8px}
+.approve .draft{font-size:12.5px;color:var(--light);background:var(--ink);border-radius:8px;padding:10px 12px;margin-bottom:10px;line-height:1.45}
+.approve .a-actions{display:flex;gap:8px}
+.approve .ok{background:var(--signal);color:#04231c;font-weight:600;font-size:12.5px;padding:8px 16px;border-radius:7px}
+.approve .countdown{font-family:'JetBrains Mono';font-size:10.5px;color:var(--dim);align-self:center}
 
-  /* CTA */
-  .cta{background:var(--ink);color:var(--text-light);border-radius:22px;padding:54px;position:relative;overflow:hidden}
-  .cta::after{content:"";position:absolute;bottom:-160px;left:-80px;width:420px;height:420px;border-radius:50%;background:radial-gradient(circle,rgba(39,211,171,.16),transparent 65%)}
-  .cta-inner{position:relative;display:grid;grid-template-columns:1fr .9fr;gap:48px;align-items:center}
-  @media(max-width:820px){.cta-inner{grid-template-columns:1fr;gap:32px}}
-  .cta h2{color:var(--text-light)}
-  .cta p{color:var(--text-dim);font-size:16.5px;max-width:420px}
-  .form{display:flex;flex-direction:column;gap:12px}
-  .form label{font-family:'JetBrains Mono';font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--text-dim)}
-  .form input{background:var(--ink-2);border:1px solid var(--line);border-radius:9px;padding:13px 15px;color:var(--text-light);font-family:'Inter';font-size:15px}
-  .form input:focus{outline:none;border-color:var(--signal)}
-  .form .btn-primary{margin-top:6px;width:100%}
-  .form-ok{font-family:'JetBrains Mono';font-size:13px;color:var(--signal);display:none;padding:10px 0}
+/* CRM */
+.crm{background:var(--ink2);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.crm-head{padding:13px 17px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
+.crm-head .t{font-family:'Space Grotesk';font-weight:600;font-size:13.5px}
+.crm-head .auto{font-family:'JetBrains Mono';font-size:9.5px;color:var(--signal);letter-spacing:.08em}
+.crm table{width:100%;border-collapse:collapse;font-size:12px}
+.crm th{font-family:'JetBrains Mono';font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--dimmer);text-align:left;padding:9px 14px;border-bottom:1px solid var(--line);font-weight:500}
+.crm td{padding:10px 14px;border-bottom:1px solid rgba(35,54,76,.5);color:var(--light);vertical-align:top}
+.crm tr.new-row{animation:rowin .45s ease}
+@keyframes rowin{from{background:rgba(39,211,171,.18)}to{background:transparent}}
+.pill{font-family:'JetBrains Mono';font-size:9.5px;padding:3px 8px;border-radius:6px;display:inline-block;white-space:nowrap}
+.pill.q{background:rgba(39,211,171,.14);color:var(--signal);border:1px solid rgba(39,211,171,.35)}
+.pill.b{background:rgba(240,162,60,.12);color:var(--cold);border:1px solid rgba(240,162,60,.35)}
+.pill.n{background:var(--ink3);color:var(--dim);border:1px solid var(--line)}
+.crm .empty{padding:22px 16px;text-align:center;font-size:12px;color:var(--dimmer)}
+.score{font-family:'JetBrains Mono';font-weight:700}
+.score.hi{color:var(--signal)} .score.mid{color:var(--cold)} .score.lo{color:var(--dimmer)}
 
-  /* footer */
-  footer{background:var(--ink);color:var(--text-dim);border-top:1px solid var(--line);padding:48px 0 40px}
-  .foot-grid{display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap;align-items:flex-start}
-  .foot-grid .logo{color:var(--text-light);margin-bottom:12px}
-  .badge{font-family:'JetBrains Mono';font-size:11.5px;color:var(--cold);border:1px solid rgba(240,162,60,.35);border-radius:7px;padding:6px 11px;display:inline-block}
-  .sources{font-family:'JetBrains Mono';font-size:11px;color:#5d728c;line-height:1.9;max-width:430px}
-  .foot-bottom{margin-top:36px;padding-top:22px;border-top:1px solid var(--line);font-size:12.5px;color:#5d728c;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
+/* footer strip */
+.foot{max-width:1240px;margin:0 auto;padding:0 22px 28px;display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;font-family:'JetBrains Mono';font-size:10px;color:var(--dimmer);letter-spacing:.04em}
+.foot b{color:var(--dim);font-weight:500}
 
-  @media(prefers-reduced-motion:reduce){
-    *{animation:none!important;transition:none!important}
-    .chips{opacity:1;transform:none}
-  }
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
 <body>
 
-<header>
-  <div class="wrap nav">
-    <div class="logo"><span class="dot"></span>AI Sales Coach</div>
-    <nav class="nav-links">
-      <a href="#problem">The cost of waiting</a>
-      <a href="#how">How it works</a>
-      <a href="#why">Why AI Sales Coach</a>
-      <a href="#who">Who it's for</a>
-    </nav>
-    <a href="#pilot" class="btn btn-primary">Join the pilot</a>
+<div class="topbar">
+  <div class="logo"><span class="dot"></span>AI Sales Coach</div>
+  <span class="demo-badge">PRODUCT DEMO · SIMULATED DATA</span>
+  <div class="spacer"></div>
+  <div class="persona-group">
+    <button class="persona" data-p="hot">▶ Hot lead</button>
+    <button class="persona" data-p="nurture">▶ Not-ready lead</button>
+    <button class="persona" data-p="wrong">▶ Wrong-fit lead</button>
   </div>
-</header>
-
-<!-- HERO -->
-<section class="hero">
-  <div class="wrap hero-grid">
-    <div>
-      <div class="eyebrow">AI sales agent · built in Columbus, OH</div>
-      <h1>Every lead, answered <span class="hl">the moment it lands.</span></h1>
-      <p class="lead-copy">AI Sales Coach is an AI sales agent for small businesses. It responds to, qualifies, and books your inbound leads in under a minute — day or night — then logs everything to your CRM. No new hires. Live in days.</p>
-      <div class="hero-cta">
-        <a href="#pilot" class="btn btn-primary">Become a design partner</a>
-        <a href="#how" class="btn btn-ghost">See how it works</a>
-      </div>
-      <div class="hero-note">// The average business takes 42 hours to reply. AI Sales Coach replies before the tab closes.</div>
-    </div>
-
-    <!-- signature: live speed-to-lead moment -->
-    <div class="panel" aria-label="Live example of AI Sales Coach answering a lead">
-      <div class="panel-top">
-        <span class="src">INBOUND · website form</span>
-        <span class="timer" id="timer">0:00</span>
-      </div>
-      <div id="thread">
-        <div class="msg lead">
-          <span class="who">New lead · Dana R.</span>
-          <span class="bubble">Hi — do you handle commercial roofing? I need a quote this week.</span>
-        </div>
-      </div>
-      <div class="chips" id="chips">
-        <span class="chip q">✓ Qualified · 87/100</span>
-        <span class="chip b">◷ Meeting booked · Thu 2:00 PM</span>
-        <span class="chip c">↳ Logged to CRM</span>
-      </div>
-    </div>
+  <div class="hitl">
+    <span>Owner approval</span>
+    <button class="switch" id="hitl" aria-label="Toggle owner approval mode" role="switch" aria-checked="false"></button>
   </div>
-</section>
-
-<!-- STAT STRIP -->
-<div class="strip">
-  <div class="wrap"><div class="strip-grid">
-    <div class="stat"><div class="num cold">42 hrs</div><div class="lbl">Average time a business takes to respond to an inbound lead.</div><div class="src">— Harvard Business Review</div></div>
-    <div class="stat"><div class="num sig">7×</div><div class="lbl">More likely to qualify a lead when you respond within an hour.</div><div class="src">— Harvard Business Review</div></div>
-    <div class="stat"><div class="num">28%</div><div class="lbl">Of a sales rep's week is actually spent selling — the rest is admin.</div><div class="src">— Salesforce, State of Sales</div></div>
-  </div></div>
+  <button class="reset" id="reset">Reset</button>
 </div>
 
-<!-- PROBLEM -->
-<section class="block" id="problem">
-  <div class="wrap">
-    <div class="sec-head">
-      <div class="kicker">The cost of waiting</div>
-      <h2>You're paying to generate leads, then letting them go cold.</h2>
-      <p>For a small business, every slow reply is revenue walking to a competitor. The buyer who filled out your form is comparing two or three options right now — and usually buys from whoever answers first.</p>
-    </div>
-    <div class="leak">
-      <div class="leak-card"><div class="big">First responder wins</div><p>Most buyers choose the business that replies first — not the cheapest, not the best. Speed is the sale.</p></div>
-      <div class="leak-card"><div class="big">Nights & weekends</div><p>Leads arrive around the clock. A human team can't. AI Sales Coach never clocks out, so no inquiry sits unanswered.</p></div>
-      <div class="leak-card"><div class="big">Too small for an SDR team</div><p>Hiring a sales-development rep isn't realistic at 5–50 people. AI Sales Coach gives you the coverage without the headcount.</p></div>
-    </div>
-  </div>
-</section>
+<div class="hint" id="hint">Pick a lead scenario above, or fill in the form yourself and press <b>Send inquiry</b>. Watch both sides of the screen.</div>
 
-<!-- HOW -->
-<section class="block" id="how" style="background:var(--paper-2);border-top:1px solid var(--line-light);border-bottom:1px solid var(--line-light)">
-  <div class="wrap">
-    <div class="sec-head">
-      <div class="kicker">How it works</div>
-      <h2>Three things, automatically, in under a minute.</h2>
-      <p>AI Sales Coach plugs into the tools you already use — your web form, inbox, calendar, and CRM — and handles the follow-up you don't have time for.</p>
-    </div>
-    <div class="steps">
-      <div class="step"><div class="n">STEP 01 · RESPOND</div><h3>Replies instantly</h3><p>A lead comes in and AI Sales Coach answers in seconds — on-brand, in your voice, 24/7. No template-bot stiffness; a real conversation.</p><div class="tick">◷ &lt; 60 seconds</div></div>
-      <div class="step"><div class="n">STEP 02 · QUALIFY</div><h3>Asks the right questions</h3><p>AI Sales Coach qualifies against your criteria — budget, timeline, fit — scores the lead, and routes hot ones to you with full context.</p><div class="tick">✓ Scored against your ICP</div></div>
-      <div class="step"><div class="n">STEP 03 · BOOK</div><h3>Books & logs everything</h3><p>Qualified leads get a meeting on your calendar. Every conversation is written to your CRM — zero manual data entry.</p><div class="tick">↳ Calendar + CRM, hands-free</div></div>
-    </div>
-  </div>
-</section>
+<div class="stage">
 
-<!-- WHY -->
-<section class="block" id="why">
-  <div class="wrap">
-    <div class="sec-head">
-      <div class="kicker">Why AI Sales Coach</div>
-      <h2>Built for small business — not bolted on from enterprise.</h2>
-      <p>The big sales-AI tools assume you already have a sales org, complex data, and a quarter to set it up. AI Sales Coach is designed for the owner who is the sales team.</p>
-    </div>
-    <div class="why">
-      <div class="why-card"><h3><span class="b"></span>Live in days, not a quarter</h3><p>Connect your form, calendar, and CRM, set your voice and criteria, and go. No implementation project, no consultant.</p></div>
-      <div class="why-card"><h3><span class="b"></span>Inbound speed, not outbound spam</h3><p>We don't blast cold prospects. AI Sales Coach wins the leads you already paid to generate — where intent is highest and ROI is immediate.</p></div>
-      <div class="why-card"><h3><span class="b"></span>Priced for a small team</h3><p>A flat subscription that costs a fraction of a hire, tiered to your lead volume. It grows as you do.</p></div>
-      <div class="why-card"><h3><span class="b"></span>You stay in control</h3><p>Start in approve-first mode — AI Sales Coach drafts, you tap send. Hand it the wheel when you trust it. Your rules, always.</p></div>
-    </div>
-  </div>
-</section>
-
-<!-- WHO -->
-<section class="block" id="who" style="background:var(--paper-2);border-top:1px solid var(--line-light);border-bottom:1px solid var(--line-light)">
-  <div class="wrap">
-    <div class="sec-head">
-      <div class="kicker">Who it's for</div>
-      <h2>Two ways to put AI Sales Coach to work.</h2>
-    </div>
-    <div class="aud">
-      <div class="aud-card">
-        <div class="tag">For small businesses</div>
-        <h3>Owner-led teams with more leads than time</h3>
-        <p>Agencies, professional firms, and home & trade services that get inbound inquiries but have no one to work them fast. AI Sales Coach catches every lead before it cools.</p>
-      </div>
-      <div class="aud-card">
-        <div class="tag">For agencies & MSPs</div>
-        <h3>Offer speed-to-lead to all your clients</h3>
-        <p>Marketing agencies and managed service providers can deploy AI Sales Coach across their book of clients as a high-value add-on — managed from one console, billed your way.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- CTA / PILOT -->
-<section class="block" id="pilot">
-  <div class="wrap">
-    <div class="cta">
-      <div class="cta-inner">
-        <div>
-          <div class="kicker" style="color:var(--signal)">Now onboarding design partners</div>
-          <h2>Be one of our first 3 pilots.</h2>
-          <p>We're partnering with a small group of Ohio businesses to run a 30-day pilot. You get speed-to-lead set up free, and we measure the lift together. Tell us where to reach you.</p>
-        </div>
-        <div>
-          <div class="form" id="form">
-            <div>
-              <label for="name">Your name</label>
-              <input id="name" type="text" placeholder="Jordan Mills" autocomplete="name" />
-            </div>
-            <div>
-              <label for="email">Work email</label>
-              <input id="email" type="email" placeholder="you@yourbusiness.com" autocomplete="email" />
-            </div>
-            <div>
-              <label for="co">Business</label>
-              <input id="co" type="text" placeholder="Mills Roofing Co." autocomplete="organization" />
-            </div>
-            <button class="btn btn-primary" id="submit" type="button">Request a pilot →</button>
-            <div class="form-ok" id="ok">✓ Thanks — we'll be in touch within the hour. (Naturally.)</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- FOOTER -->
-<footer>
-  <div class="wrap">
-    <div class="foot-grid">
+  <!-- LEFT: the lead's experience -->
+  <div class="phone">
+    <div class="phone-head">
       <div>
-        <div class="logo"><span class="dot"></span>AI Sales Coach</div>
-        <span class="badge">◷ Idea stage · validating in Columbus, Ohio</span>
+        <div class="lbl">THE LEAD'S VIEW</div>
+        <div class="biz">Mills Roofing Co. — Contact</div>
       </div>
-      <div class="sources">
-        <strong style="color:var(--text-dim)">Sources</strong><br>
-        Lead-response data: Harvard Business Review (Oldroyd / InsideSales audit of 2,241 U.S. firms).<br>
-        Selling-time data: Salesforce, State of Sales.<br>
-        Market base: U.S. Small Business Administration, Ohio 2025 State Profile.
-      </div>
+      <span class="mono" style="font-size:10px;color:var(--dimmer)">millsroofing.com</span>
     </div>
-    <div class="foot-bottom">
-      <span>© 2026 AI Sales Coach. An AI sales agent for small business.</span>
-      <span class="mono">Every lead. Answered first.</span>
+    <div class="phone-body">
+      <div class="form" id="leadForm">
+        <h3>Get a quote</h3>
+        <p>Tell us what you need — we'll get right back to you.</p>
+        <label for="f-name">Name</label>
+        <input id="f-name" type="text" value="Dana Reyes" />
+        <label for="f-email">Email</label>
+        <input id="f-email" type="email" value="dana@harborlogistics.com" />
+        <label for="f-msg">What do you need?</label>
+        <textarea id="f-msg" rows="3">Do you handle commercial roofing? We need a quote this week.</textarea>
+        <button class="send" id="send">Send inquiry</button>
+      </div>
+      <div class="chat" id="chat"></div>
     </div>
   </div>
-</footer>
+
+  <!-- RIGHT: the owner's experience -->
+  <div class="dash">
+    <div class="dash-head">
+      <h2>Owner dashboard</h2>
+      <span class="sub">MILLS ROOFING CO. · LIVE</span>
+    </div>
+
+    <div class="race">
+      <div class="t idle" id="raceTimer">0:00.0</div>
+      <div class="vs">Time to first response — this lead.<br>Industry average: <b>42 hours</b> (Harvard Business Review).</div>
+    </div>
+
+    <div class="metrics">
+      <div class="metric"><div class="v sig" id="mResp">—</div><div class="k">Avg response time</div></div>
+      <div class="metric"><div class="v" id="mLeads">0</div><div class="k">Leads handled</div></div>
+      <div class="metric"><div class="v" id="mQual">—</div><div class="k">Qualified rate</div></div>
+      <div class="metric"><div class="v warm" id="mBook">0</div><div class="k">Meetings booked</div></div>
+    </div>
+
+    <div class="approve" id="approveCard">
+      <div class="a-head">⏸ AWAITING YOUR APPROVAL — agent drafted this reply</div>
+      <div class="draft" id="draftText"></div>
+      <div class="a-actions">
+        <button class="ok" id="approveBtn">Approve & send</button>
+        <span class="countdown" id="autoNote">auto-approves in <span id="cd">4</span>s</span>
+      </div>
+    </div>
+
+    <div class="crm">
+      <div class="crm-head">
+        <span class="t">CRM — Leads</span>
+        <span class="auto">↳ AUTO-LOGGED BY AGENT</span>
+      </div>
+      <table>
+        <thead><tr><th>Lead</th><th>Score</th><th>Status</th><th>Next step</th></tr></thead>
+        <tbody id="crmBody"></tbody>
+      </table>
+      <div class="empty" id="crmEmpty">No leads yet — run a scenario to watch this fill itself.</div>
+    </div>
+  </div>
+</div>
+
+<div class="foot">
+  <span><b>Demo notes:</b> scripted simulation — no data is sent or stored. Production agent connects to your real web form, inbox, calendar, and CRM.</span>
+  <span>AI Sales Coach · Columbus, Ohio</span>
+</div>
 
 <script>
-  // Hero "speed-to-lead" moment: typing + reply + timer + chips
-  (function(){
-    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    var thread = document.getElementById('thread');
-    var timerEl = document.getElementById('timer');
-    var chips = document.getElementById('chips');
+(function(){
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    var reply = "Hi Dana! Yes — commercial roofing is one of our specialties. To get you an accurate quote fast, what's the approximate property size, and is this for repair or full replacement?";
+  // ---------- state ----------
+  var hitlOn = false, running = false;
+  var leadsHandled = 0, qualifiedCt = 0, booked = 0, respTimes = [];
+  var raceStart = null, raceRAF = null;
 
-    function fmt(t){ var s=Math.floor(t); return '0:'+(s<10?'0':'')+s; }
+  var $ = function(id){ return document.getElementById(id); };
+  var chat = $('chat'), form = $('leadForm');
 
-    function showChips(){ chips.classList.add('show'); }
+  // ---------- personas ----------
+  var personas = {
+    hot: {
+      form: { name:"Dana Reyes", email:"dana@harborlogistics.com", msg:"Do you handle commercial roofing? We need a quote this week." },
+      flow: [
+        {agent:"Hi Dana! Yes — commercial roofing is one of our specialties. So I can get you an accurate quote fast: roughly how large is the property, and is this a repair or a full replacement?"},
+        {lead:"It's a 40,000 sq ft warehouse. Full replacement — we've got recurring leaks."},
+        {agent:"Got it — a 40,000 sq ft warehouse replacement is right in our wheelhouse. Our estimator can walk the site this week. Would Thursday at 2:00 PM or Friday at 10:00 AM work for you?"},
+        {lead:"Thursday 2pm works."},
+        {agent:"Perfect — you're booked for Thursday at 2:00 PM with our estimator, and I've sent a confirmation to dana@harborlogistics.com. We'll bring a full assessment and quote outline. Anything else I can answer before then?"},
+        {sys:"Meeting booked · Thu 2:00 PM", cls:"warm"},
+      ],
+      result: { name:"Dana Reyes", co:"Harbor Logistics", score:87, status:"q", statusTxt:"Qualified", next:"Meeting · Thu 2:00 PM", book:true, qual:true }
+    },
+    nurture: {
+      form: { name:"Marcus Till", email:"marcus@tillproperty.com", msg:"How much does a roof inspection usually run? Might need one in a few months." },
+      flow: [
+        {agent:"Hi Marcus, happy to help. Our commercial inspections start at $450 depending on roof size and access. You mentioned a few months out — is this for budgeting ahead, or are you seeing any issues now?"},
+        {lead:"Just budgeting for now. We reroof one building a year and want numbers for the board."},
+        {agent:"That makes sense. I'll send you our inspection guide and typical replacement cost ranges so you have solid numbers for the board. Want me to check back in early September when you're closer to deciding?"},
+        {lead:"Yes, September is good."},
+        {agent:"Done — I've scheduled a follow-up for early September and the guide is on its way to marcus@tillproperty.com. Talk then!"},
+        {sys:"Follow-up scheduled · Sept 1", cls:"warm"},
+      ],
+      result: { name:"Marcus Till", co:"Till Property Group", score:54, status:"b", statusTxt:"Nurture", next:"Follow-up · Sept 1", book:false, qual:true }
+    },
+    wrong: {
+      form: { name:"Pat Onu", email:"pat.onu@gmail.com", msg:"Do you clean gutters on houses? Mine are overflowing." },
+      flow: [
+        {agent:"Hi Pat — thanks for reaching out! We focus on commercial roofing, so residential gutter cleaning isn't something we take on. A local residential service will be a much better fit (and faster for you)."},
+        {lead:"Ah okay, no problem. Thanks for the quick reply!"},
+        {agent:"Anytime! And if your business ever needs commercial roof work, we're here. Good luck with those gutters!"},
+        {sys:"Politely declined · logged as out-of-scope", cls:""},
+      ],
+      result: { name:"Pat Onu", co:"—", score:12, status:"n", statusTxt:"Out of scope", next:"None — closed politely", book:false, qual:false }
+    }
+  };
 
-    function runTimer(stopAt){
-      var start = performance.now();
-      function tick(now){
-        var el = (now-start)/1000;
-        if(el>=stopAt){ timerEl.textContent = fmt(stopAt); return; }
-        timerEl.textContent = fmt(el);
-        requestAnimationFrame(tick);
+  // ---------- helpers ----------
+  function fmtRace(ms){
+    var s = ms/1000;
+    return "0:" + (s<10?"0":"") + s.toFixed(1);
+  }
+  function startRace(){
+    raceStart = performance.now();
+    var el = $('raceTimer'); el.classList.remove('idle');
+    function tick(){
+      el.textContent = fmtRace(performance.now() - raceStart);
+      raceRAF = requestAnimationFrame(tick);
+    }
+    if(!reduce) raceRAF = requestAnimationFrame(tick);
+  }
+  function stopRace(){
+    if(raceRAF) cancelAnimationFrame(raceRAF);
+    var elapsed = performance.now() - raceStart;
+    $('raceTimer').textContent = fmtRace(elapsed);
+    respTimes.push(elapsed/1000);
+    var avg = respTimes.reduce(function(a,b){return a+b;},0) / respTimes.length;
+    $('mResp').textContent = avg.toFixed(1) + "s";
+    return elapsed;
+  }
+  function addMsg(side, who, text){
+    var row = document.createElement('div');
+    row.className = 'bubble-row from-' + side;
+    row.innerHTML = '<span class="who">' + who + '</span><span class="bubble"></span>';
+    row.querySelector('.bubble').textContent = text;
+    chat.appendChild(row);
+    chat.scrollTop = chat.scrollHeight;
+    return row;
+  }
+  function addSys(text, cls){
+    var d = document.createElement('div');
+    d.className = 'sysline ' + (cls || 'good');
+    d.textContent = '— ' + text + ' —';
+    chat.appendChild(d);
+  }
+  function typing(){
+    var row = document.createElement('div');
+    row.className = 'bubble-row from-agent';
+    row.innerHTML = '<span class="who">AI Sales Coach</span><span class="bubble typing-bubble"><span></span><span></span><span></span></span>';
+    chat.appendChild(row);
+    chat.scrollTop = chat.scrollHeight;
+    return row;
+  }
+  function wait(ms){ return new Promise(function(r){ setTimeout(r, reduce ? 60 : ms); }); }
+
+  // human-in-the-loop gate: returns a promise resolved on approve or auto-timeout
+  function approvalGate(draft){
+    return new Promise(function(resolve){
+      var card = $('approveCard'); $('draftText').textContent = draft;
+      card.classList.add('show');
+      var secs = 4; $('cd').textContent = secs;
+      var iv = setInterval(function(){
+        secs--; $('cd').textContent = secs;
+        if(secs <= 0){ done(); }
+      }, 1000);
+      function done(){
+        clearInterval(iv);
+        card.classList.remove('show');
+        $('approveBtn').removeEventListener('click', done);
+        resolve();
       }
-      requestAnimationFrame(tick);
-    }
-
-    if(reduce){
-      // Static, accessible end-state
-      var m=document.createElement('div'); m.className='msg agent';
-      m.innerHTML='<span class="who">AI Sales Coach · replied in 4s</span><span class="bubble">'+reply+'</span>';
-      thread.appendChild(m); timerEl.textContent='0:04'; showChips(); return;
-    }
-
-    runTimer(4);
-
-    // typing indicator
-    setTimeout(function(){
-      var t=document.createElement('div'); t.className='msg agent typing'; t.id='typing';
-      t.innerHTML='<span class="who">AI Sales Coach</span><span class="bubble"><span></span><span></span><span></span></span>';
-      thread.appendChild(t);
-    }, 700);
-
-    // replace with typed-out reply
-    setTimeout(function(){
-      var t=document.getElementById('typing'); if(t) t.remove();
-      var m=document.createElement('div'); m.className='msg agent';
-      m.innerHTML='<span class="who">AI Sales Coach · replied in 4s</span><span class="bubble"></span>';
-      thread.appendChild(m);
-      var b=m.querySelector('.bubble'); var i=0;
-      (function type(){
-        if(i<=reply.length){ b.textContent=reply.slice(0,i); i+=2; setTimeout(type,18); }
-        else { b.textContent=reply; setTimeout(showChips,400); }
-      })();
-    }, 1900);
-  })();
-
-  // Pilot form (demo only — no submission, no storage)
-  (function(){
-    var btn=document.getElementById('submit');
-    var ok=document.getElementById('ok');
-    btn.addEventListener('click', function(){
-      ok.style.display='block';
-      btn.textContent='Request received ✓';
-      btn.style.background='var(--signal-deep)';
+      $('approveBtn').addEventListener('click', done);
     });
-  })();
+  }
+
+  function logCRM(r){
+    $('crmEmpty').style.display = 'none';
+    var tb = $('crmBody');
+    var tr = document.createElement('tr');
+    tr.className = 'new-row';
+    var scoreCls = r.score >= 75 ? 'hi' : (r.score >= 40 ? 'mid' : 'lo');
+    tr.innerHTML =
+      '<td><b>' + r.name + '</b><br><span style="color:var(--dimmer);font-size:10.5px">' + r.co + '</span></td>' +
+      '<td><span class="score ' + scoreCls + '">' + r.score + '</span><span style="color:var(--dimmer)">/100</span></td>' +
+      '<td><span class="pill ' + r.status + '">' + r.statusTxt + '</span></td>' +
+      '<td style="color:var(--dim)">' + r.next + '</td>';
+    tb.insertBefore(tr, tb.firstChild);
+  }
+
+  function updateMetrics(r){
+    leadsHandled++;
+    if(r.qual) qualifiedCt++;
+    if(r.book) booked++;
+    $('mLeads').textContent = leadsHandled;
+    $('mQual').textContent = Math.round(qualifiedCt/leadsHandled*100) + "%";
+    $('mBook').textContent = booked;
+  }
+
+  // ---------- run a scenario ----------
+  async function run(key){
+    if(running) return;
+    running = true;
+    setButtons(true);
+    var p = personas[key];
+
+    // show form filled, then "submit"
+    $('f-name').value = p.form.name;
+    $('f-email').value = p.form.email;
+    $('f-msg').value = p.form.msg;
+    $('hint').textContent = "Lead submitted — watch the response timer on the right.";
+    await wait(700);
+
+    form.style.display = 'none';
+    chat.classList.add('show');
+    chat.innerHTML = '';
+    addMsg('lead', 'New lead · ' + p.form.name.split(' ')[0], p.form.msg);
+    startRace();
+
+    // first agent reply (the race moment)
+    await wait(900);
+    if(hitlOn){
+      var t0 = typing(); await wait(900); t0.remove();
+      await approvalGate(p.flow[0].agent);
+    } else {
+      var t1 = typing(); await wait(1700); t1.remove();
+    }
+    var ms = stopRace();
+    addMsg('agent', 'AI Sales Coach · replied in ' + (ms/1000).toFixed(1) + 's', p.flow[0].agent);
+
+    // remaining flow
+    for(var i = 1; i < p.flow.length; i++){
+      var step = p.flow[i];
+      if(step.lead){
+        await wait(1500);
+        addMsg('lead', p.form.name.split(' ')[0], step.lead);
+      } else if(step.agent){
+        await wait(1100);
+        if(hitlOn){ await approvalGate(step.agent); }
+        else { var t = typing(); await wait(1400); t.remove(); }
+        addMsg('agent', 'AI Sales Coach', step.agent);
+      } else if(step.sys){
+        await wait(800);
+        addSys(step.sys, step.cls);
+      }
+    }
+
+    // log + metrics
+    await wait(800);
+    addSys('Conversation logged to CRM', 'good');
+    logCRM(p.result);
+    updateMetrics(p.result);
+    $('hint').textContent = "Done — the CRM updated itself. Try another scenario, or toggle Owner approval to see human-in-the-loop mode.";
+    running = false;
+    setButtons(false);
+  }
+
+  function setButtons(disabled){
+    document.querySelectorAll('.persona').forEach(function(b){ b.disabled = disabled; });
+    $('send').disabled = disabled;
+  }
+
+  function resetPhone(){
+    chat.classList.remove('show'); chat.innerHTML = '';
+    form.style.display = 'block';
+    $('raceTimer').textContent = '0:00.0';
+    $('raceTimer').classList.add('idle');
+    $('approveCard').classList.remove('show');
+    document.querySelectorAll('.persona').forEach(function(b){ b.classList.remove('active'); });
+  }
+
+  // ---------- wiring ----------
+  document.querySelectorAll('.persona').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      if(running) return;
+      resetPhone();
+      btn.classList.add('active');
+      run(btn.dataset.p);
+    });
+  });
+
+  $('send').addEventListener('click', function(){
+    if(running) return;
+    // custom submission uses the hot-lead flow with the typed message
+    var custom = JSON.parse(JSON.stringify(personas.hot));
+    custom.form.name = $('f-name').value || "Web Lead";
+    custom.form.email = $('f-email').value || "lead@example.com";
+    custom.form.msg = $('f-msg').value || personas.hot.form.msg;
+    custom.result.name = custom.form.name;
+    custom.result.co = "Web inquiry";
+    personas._custom = custom;
+    resetPhone();
+    run('_custom');
+  });
+
+  $('hitl').addEventListener('click', function(){
+    hitlOn = !hitlOn;
+    this.classList.toggle('on', hitlOn);
+    this.setAttribute('aria-checked', String(hitlOn));
+    $('hint').textContent = hitlOn
+      ? "Owner approval ON — the agent will draft replies and wait for your approve before sending."
+      : "Owner approval OFF — the agent sends autonomously.";
+  });
+
+  $('reset').addEventListener('click', function(){
+    if(running) return;
+    resetPhone();
+    leadsHandled = 0; qualifiedCt = 0; booked = 0; respTimes = [];
+    $('mResp').textContent = '—'; $('mLeads').textContent = '0';
+    $('mQual').textContent = '—'; $('mBook').textContent = '0';
+    $('crmBody').innerHTML = ''; $('crmEmpty').style.display = 'block';
+    $('hint').innerHTML = 'Pick a lead scenario above, or fill in the form yourself and press <b>Send inquiry</b>. Watch both sides of the screen.';
+  });
+})();
 </script>
 </body>
 </html>
